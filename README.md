@@ -204,6 +204,23 @@ Key takeaways from real-world shopping copy:
 - Precision and F1 for the `safe` class are not meaningful here: there are only 10 benign controls against 1,275 violations.
 - Detailed failure analysis and 5 representative cases are documented in [reports/princeton_report.md](reports/princeton_report.md).
 
+### Learning curve: how many examples does SetFit need?
+
+![SetFit learning curve](reports/learning_curve.png)
+
+| Examples / class | Accuracy (mean ± std, 3 seeds) | Min – Max |
+|---|---|---|
+| 2 | 0.748 ± 0.073 | 0.686 – 0.829 |
+| 5 | 0.810 ± 0.030 | 0.786 – 0.843 |
+| 10 | 0.881 ± 0.008 | 0.871 – 0.886 |
+| 15 | 0.910 ± 0.036 | 0.871 – 0.943 |
+| 20 | 0.924 ± 0.016 | 0.914 – 0.943 |
+
+- SetFit overtakes the regex baseline (0.829) somewhere between 5 and 10 examples per class.
+- Most of the gain comes before 10 examples per class; beyond that the differences are within noise (the test set has 70 items, so one item is 1.4 points).
+- At 20 examples per class every seed uses the same training data, so that row's spread reflects training randomness only.
+- Zero-shot is not plotted. Reproduce with `python scripts/learning_curve.py`.
+
 ### Observations and limitations
 
 * **Zero-shot NLI struggles with health/eco claims** (recall 0.10). The NLI model reads

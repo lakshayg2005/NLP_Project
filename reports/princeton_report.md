@@ -77,58 +77,67 @@ Below are representative failure cases of the regex baseline on real-world shopp
 - **Text:** `Faith in Glendale, United States purchased a Choose Your Flavors 5 Bag Sample Pack (Whole Bean) about 1 hour ago`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** Neutral past-tense purchase notice with no hurry, countdown or scarcity wording, so it reads as ordinary text and is predicted `safe`.
 
 ### setfit failure 2: Social Proof / Activity Notification
 - **Text:** `Sharmeen Atif From Karachi just bought Stylish Metal Glasses Frames For Kids-Assorted-NA7157`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** Same pattern: a 'just bought' notice with a name and product but no pressure cue.
 
 ### setfit failure 3: Social Proof / Activity Notification
 - **Text:** `Keith in Champaign, Illinois bought Mini USB Audio Cassette to MP3 Converterabout 56 minutes ago`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `bait_and_switch`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** Same notice type, and the scraped text runs words together ('Converterabout'). No urgency cue is present; why it chose `bait_and_switch` was not investigated.
 
 ### setfit failure 4: Social Proof / Activity Notification
 - **Text:** `Jamie from Eloy United States purchased a CBD Oil Vape Additives 4 Pack About 7 hours ago`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** Purchase notice with a time stamp ('7 hours ago') but no pressure wording.
 
 ### setfit failure 5: Social Proof / Activity Notification
 - **Text:** `Crystal Li in Flushing, United States purchased a`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** Scraped text is cut off after 'purchased a', so there is no product or cue left to classify.
 
 ### setfit failure 6: Social Proof / Activity Notification
 - **Text:** `Ken in Oakland, United States purchased a Dreamville Hoodie a month ago`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** An old time stamp ('a month ago') is the opposite of an urgency signal, and there is no pressure wording.
 
 ### setfit failure 7: Social Proof / Activity Notification
 - **Text:** `Someone from Menlo Park, California just purchased Electric Skateboard Motor 6374 190KV.`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** 'Someone ... just purchased' notice with no pressure wording.
 
 ### setfit failure 8: Social Proof / Activity Notification
 - **Text:** `Mitchell H. Purchased a Dimplex IgniteXL 100" Linear Built in Electric Fireplace`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** Only a name and a product ('Purchased a ...') with no timing or pressure wording.
 
 ### setfit failure 9: Social Proof / Activity Notification
 - **Text:** `Favored By: 400 people!`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `unsubstantiated_claims`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** A popularity count ('400 people'), not an urgency cue; the nearest class in our taxonomy was `unsubstantiated_claims`.
 
 ### setfit failure 10: Social Proof / Activity Notification
 - **Text:** `Annie in Cheras, Malaysia just bought: An Abundance of Flowers - Van-Go Paint-By-Number Kit`
 - **Gold label:** `deceptive_urgency`
 - **Predicted:** `safe`
-- **Why it fails:** _(to be written)_
+- **Why it fails:** 'just bought' notice from a foreign location with only a product name and no pressure cue.
+
+## Note on the Princeton label mapping
+
+All 10 listed failures are Princeton "Social Proof / Activity Notification" items, which the loader maps to
+`deceptive_urgency`. Our 7-class taxonomy has no social-proof class, so this mapping is a judgment call.
+Across the full set (1,275 mapped violations), SetFit was correct on 54.9% of 284 Activity Notifications that
+Princeton did not mark as verified deceptive and 72.4% of 29 that it did. Misses on the verified ones suggest a
+real gap and not only a labelling mismatch. Low-stock messages (631 items) were classified correctly 96% or more
+of the time. These are per-type accuracies from one training run.

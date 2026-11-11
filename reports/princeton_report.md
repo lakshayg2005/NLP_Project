@@ -4,7 +4,7 @@ Test set: Princeton 'Dark Patterns at Scale' dataset (1275 examples)
 
 | System | Accuracy | Macro-F1 | ms / item (incl. model load) |
 |---|---|---|---|
-| regex | 0.636 | 0.389 | 0.1 |
+| regex | 0.636 | 0.778 | 0.1 |
 
 ## regex
 
@@ -21,7 +21,7 @@ subscription_trap      0.968     0.652     0.779        46
 
 ## Real-World Failure Analysis (Princeton Dataset)
 
-Below are representative failure cases from real-world shopping sites where the model missed dark patterns, along with root-cause explanations:
+Below are representative failure cases of the regex baseline on real-world shopping sites, along with root-cause explanations:
 
 ### Example 1: Social Proof (Activity Notification)
 - **Text:** `Faith in Glendale, United States purchased a Choose Your Flavors 5 Bag Sample Pack (Whole Bean) about 1 hour ago`

@@ -121,6 +121,31 @@ API endpoints:
 pytest -q
 ```
 
+## Reproducing the experiments (workstream A)
+
+Each command is self-contained and needs the trained models in `models/` (see "Train the models").
+
+```bash
+# A1: real-world evaluation, all systems (the flag adds only 10 benign controls vs 1,275 violations,
+#     so treat precision on `safe` as indicative at best)
+python scripts/evaluate.py --princeton --systems regex zero_shot setfit --include-safe-controls
+
+# A2: SetFit learning curve (2/5/10/15/20 examples per class x 3 seeds)  -> reports/learning_curve.{png,csv,md}
+python scripts/learning_curve.py                # add --no-zero-shot to skip the bart-large-mnli line
+
+# A3: three-phase ablation + threshold sweep                          -> reports/ablation.{md,_sweep.png,_sweep.csv}
+python scripts/ablation.py
+
+# A4: enlarged test set with two annotators, see docs/annotation_protocol_v2.md
+python scripts/annotation_agreement.py make-sheets      # then annotate independently
+python scripts/annotation_agreement.py kappa --drafter data/annotation/drafter_labels.csv
+python scripts/annotation_agreement.py merge            # -> data/test_set_v2.csv
+python scripts/evaluate.py --data data/test_set_v2.csv --out reports/classification_report_v2.md
+```
+
+`python scripts/learning_curve.py --dry-run` checks the plumbing with a TF-IDF stand-in in seconds
+(its output goes to a temp folder and is not a result).
+
 ## Results
 
 Hardware: single consumer GPU (CUDA). Full reports are in [reports/](reports/).

@@ -189,15 +189,19 @@ test set (recall 1.0). Most remaining strict errors are boundary disagreements, 
 
 ### Real-world results (Princeton "Dark Patterns at Scale" dataset)
 
-Evaluated on 1,275 real-world dark-pattern texts crawled from ~11,000 shopping sites ([Mathur et al., 2019](https://github.com/aruneshmathur/dark-patterns-at-scale)) mapped to our taxonomy (see [docs/label_mapping.md](docs/label_mapping.md) and [reports/princeton_report.md](reports/princeton_report.md)):
+Evaluated on 1,275 real-world dark-pattern texts (plus 10 benign controls, 1,285 items in total) crawled from ~11,000 shopping sites ([Mathur et al., 2019](https://github.com/aruneshmathur/dark-patterns-at-scale)) mapped to our taxonomy (see [docs/label_mapping.md](docs/label_mapping.md) and [reports/princeton_report.md](reports/princeton_report.md)):
 
 | System | Accuracy | Deceptive Urgency F1 | Subscription Trap F1 | Speed |
 |---|---|---|---|---|
-| Regex lexicon baseline | 0.636 | 0.777 | 0.779 | 0.1 ms / item |
+| Regex lexicon baseline | 0.638 | 0.777 | 0.769 | 0.1 ms / item |
+| SetFit (trained on `seed_corpus.csv`) | 0.825 | 0.902 | 0.777 | ~6 ms / item |
 
 Key takeaways from real-world shopping copy:
-- **High precision (0.97 - 1.00):** When the regex fires, it is almost always correct.
+- **Regex: high precision (0.94 - 1.00):** When the regex fires, it is almost always correct.
 - **Recall drop on open-ended phrasing (~64%):** Real sites use long-tail synonyms (e.g. "purchased a" vs "bought", "seeing" vs "viewing", implicit scarcity like "in high demand" without numbers), highlighting why Phase 2 transformer embeddings and few-shot fine-tuning are vital.
+- **SetFit recovers much of the recall:** urgency recall 0.823 (precision 0.998), subscription-trap recall 0.870 (precision 0.702, only 46 examples).
+- **Most remaining misses are social-proof notices** (e.g. "Faith in Glendale purchased a ... about 1 hour ago"), which carry no pressure wording and have no class of their own in our taxonomy. Accuracy on Princeton "Activity Notification" items was 55% (284 not verified as deceptive) and 72% (29 verified). Low-stock messages were classified correctly 96% or more of the time. Results are from a single training run.
+- Precision and F1 for the `safe` class are not meaningful here: there are only 10 benign controls against 1,275 violations.
 - Detailed failure analysis and 5 representative cases are documented in [reports/princeton_report.md](reports/princeton_report.md).
 
 ### Observations and limitations

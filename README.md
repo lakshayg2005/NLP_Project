@@ -251,6 +251,20 @@ Measured on the 70-item test set with the SetFit classifier (full report: [repor
 - SetFit's weak spots on v2: `safe` recall 0.51 and `subscription_trap` precision 0.57, meaning many safe texts are labelled as violations. The cause has not been investigated.
 - Some v2 errors may be label ambiguity and not model mistakes, since the labels were not cross-checked.
 
+### Larger test set (v2)
+
+`data/test_set_v2.csv` has 245 items (35 per class), including tricky `safe` texts (transparent fees, negated wording) and boundary cases such as drip pricing vs. bait and switch. Full report: [reports/classification_report_v2.md](reports/classification_report_v2.md).
+
+| Test set | Regex | SetFit (one training run) |
+|---|---|---|
+| `test_set.csv` (70 items) | 0.829 | 0.929 |
+| `test_set_v2.csv` (245 items) | 0.465 | 0.829 |
+
+- **The v2 labels come from a single annotator (the drafter). Inter-annotator agreement was not measured.** The two-annotator workflow is in `docs/annotation_protocol_v2.md` and `scripts/annotation_agreement.py` and can be run later.
+- Regex accuracy drops by more than 35 points; on v2 it finds almost no confirm-shaming, drip-pricing or bait-and-switch items (recall 0.17, 0.11, 0.03).
+- SetFit's weak spots on v2: `safe` recall 0.51 and `subscription_trap` precision 0.57, meaning many safe texts are labelled as violations. The cause has not been investigated.
+- Some v2 errors may be label ambiguity and not model mistakes, since the labels were not cross-checked.
+
 ### Observations and limitations
 
 * **Zero-shot NLI struggles with health/eco claims** (recall 0.10). The NLI model reads

@@ -183,11 +183,11 @@ def factual_summary(results: dict[str, dict]) -> list[str]:
     names = list(results)
     a, b, c = (results[n] for n in names)
     return [
-        f"- Phase 1 regex gate: {a['reached_transformer'] - b['reached_transformer']} of {a['n']} items "
-        f"skip the transformer; accuracy on auto-decided items goes from {_fmt(a['accuracy_auto'])} to "
+        f"- Phase 1 regex gate: items reaching the transformer {a['reached_transformer']} to "
+        f"{b['reached_transformer']} (of {a['n']}); accuracy on auto-decided items goes from {_fmt(a['accuracy_auto'])} to "
         f"{_fmt(b['accuracy_auto'])}; time per item {a['ms_total']:.1f} ms to {b['ms_total']:.1f} ms.",
-        f"- Adding the semantic gate: {b['reached_transformer'] - c['reached_transformer']} further items skip the "
-        f"transformer; accuracy {_fmt(b['accuracy_auto'])} to {_fmt(c['accuracy_auto'])}; "
+        f"- Adding the semantic gate: items reaching the transformer {b['reached_transformer']} to "
+        f"{c['reached_transformer']}; accuracy {_fmt(b['accuracy_auto'])} to {_fmt(c['accuracy_auto'])}; "
         f"time per item {b['ms_total']:.1f} ms to {c['ms_total']:.1f} ms.",
         f"- Human-review items: {a['n_review']} (a), {b['n_review']} (b), {c['n_review']} (c).",
     ]

@@ -121,6 +121,31 @@ API endpoints:
 pytest -q
 ```
 
+## Reproducing the experiments (workstream A)
+
+Each command is self-contained and needs the trained models in `models/` (see "Train the models").
+
+```bash
+# A1: real-world evaluation, all systems (the flag adds only 10 benign controls vs 1,275 violations,
+#     so treat precision on `safe` as indicative at best)
+python scripts/evaluate.py --princeton --systems regex zero_shot setfit --include-safe-controls
+
+# A2: SetFit learning curve (2/5/10/15/20 examples per class x 3 seeds)  -> reports/learning_curve.{png,csv,md}
+python scripts/learning_curve.py                # add --no-zero-shot to skip the bart-large-mnli line
+
+# A3: three-phase ablation + threshold sweep                          -> reports/ablation.{md,_sweep.png,_sweep.csv}
+python scripts/ablation.py
+
+# A4: enlarged test set with two annotators, see docs/annotation_protocol_v2.md
+python scripts/annotation_agreement.py make-sheets      # then annotate independently
+python scripts/annotation_agreement.py kappa --drafter data/annotation/drafter_labels.csv
+python scripts/annotation_agreement.py merge            # -> data/test_set_v2.csv
+python scripts/evaluate.py --data data/test_set_v2.csv --out reports/classification_report_v2.md
+```
+
+`python scripts/learning_curve.py --dry-run` checks the plumbing with a TF-IDF stand-in in seconds
+(its output goes to a temp folder and is not a result).
+
 ## Results
 
 Hardware: single consumer GPU (CUDA). Full reports are in [reports/](reports/).
@@ -164,16 +189,81 @@ test set (recall 1.0). Most remaining strict errors are boundary disagreements, 
 
 ### Real-world results (Princeton "Dark Patterns at Scale" dataset)
 
-Evaluated on 1,275 real-world dark-pattern texts crawled from ~11,000 shopping sites ([Mathur et al., 2019](https://github.com/aruneshmathur/dark-patterns-at-scale)) mapped to our taxonomy (see [docs/label_mapping.md](docs/label_mapping.md) and [reports/princeton_report.md](reports/princeton_report.md)):
+Evaluated on 1,275 real-world dark-pattern texts (plus 10 benign controls, 1,285 items in total) crawled from ~11,000 shopping sites ([Mathur et al., 2019](https://github.com/aruneshmathur/dark-patterns-at-scale)) mapped to our taxonomy (see [docs/label_mapping.md](docs/label_mapping.md) and [reports/princeton_report.md](reports/princeton_report.md)):
 
 | System | Accuracy | Deceptive Urgency F1 | Subscription Trap F1 | Speed |
 |---|---|---|---|---|
-| Regex lexicon baseline | 0.636 | 0.777 | 0.779 | 0.1 ms / item |
+| Regex lexicon baseline | 0.638 | 0.777 | 0.769 | 0.1 ms / item |
+| SetFit (trained on `seed_corpus.csv`) | 0.825 | 0.902 | 0.777 | ~6 ms / item |
 
 Key takeaways from real-world shopping copy:
-- **High precision (0.97 - 1.00):** When the regex fires, it is almost always correct.
+- **Regex: high precision (0.94 - 1.00):** When the regex fires, it is almost always correct.
 - **Recall drop on open-ended phrasing (~64%):** Real sites use long-tail synonyms (e.g. "purchased a" vs "bought", "seeing" vs "viewing", implicit scarcity like "in high demand" without numbers), highlighting why Phase 2 transformer embeddings and few-shot fine-tuning are vital.
+- **SetFit recovers much of the recall:** urgency recall 0.823 (precision 0.998), subscription-trap recall 0.870 (precision 0.702, only 46 examples).
+- **Most remaining misses are social-proof notices** (e.g. "Faith in Glendale purchased a ... about 1 hour ago"), which carry no pressure wording and have no class of their own in our taxonomy. Accuracy on Princeton "Activity Notification" items was 55% (284 not verified as deceptive) and 72% (29 verified). Low-stock messages were classified correctly 96% or more of the time. Results are from a single training run.
+- Precision and F1 for the `safe` class are not meaningful here: there are only 10 benign controls against 1,275 violations.
 - Detailed failure analysis and 5 representative cases are documented in [reports/princeton_report.md](reports/princeton_report.md).
+
+### Learning curve: how many examples does SetFit need?
+
+![SetFit learning curve](reports/learning_curve.png)
+
+| Examples / class | Accuracy (mean ± std, 3 seeds) | Min – Max |
+|---|---|---|
+| 2 | 0.748 ± 0.073 | 0.686 – 0.829 |
+| 5 | 0.810 ± 0.030 | 0.786 – 0.843 |
+| 10 | 0.881 ± 0.008 | 0.871 – 0.886 |
+| 15 | 0.910 ± 0.036 | 0.871 – 0.943 |
+| 20 | 0.924 ± 0.016 | 0.914 – 0.943 |
+
+- SetFit overtakes the regex baseline (0.829) somewhere between 5 and 10 examples per class.
+- Most of the gain comes before 10 examples per class; beyond that the differences are within noise (the test set has 70 items, so one item is 1.4 points).
+- At 20 examples per class every seed uses the same training data, so that row's spread reflects training randomness only.
+- Zero-shot is not plotted. Reproduce with `python scripts/learning_curve.py`.
+
+### Ablation: does each phase earn its place?
+
+Measured on the 70-item test set with the SetFit classifier (full report: [reports/ablation.md](reports/ablation.md)):
+
+| Design | Accuracy (auto-decided) | Reach transformer | ms / item |
+|---|---|---|---|
+| (a) classifier only | 0.942 | 70 | 3.1 |
+| (b) regex + classifier | 0.829 | 53 | 2.3 |
+| (c) regex + semantic + classifier | 0.942 | 63 | 200.3 |
+
+- The regex gate lost about 11 points of accuracy for a saving of about 0.8 ms per item: anything it misses is passed as safe without being classified.
+- The semantic gate recovered the accuracy but costs about 196 ms per item for the embedding step.
+- On short texts and this laptop, classifier-only was as accurate as the full design and about 65 times faster. A gate might still pay off with long documents or a much slower classifier, which this test does not measure.
+- Sweeping FLAG and REVIEW thresholds, accuracy stayed between 0.928 and 0.942 and at most 4.3% of items went to review; the current 0.7 / 0.5 setting sits on that plateau.
+- The test set was written by the same team as the lexicon, and one item is 1.4 points, so small differences are not reliable.
+
+### Larger test set (v2)
+
+`data/test_set_v2.csv` has 245 items (35 per class), including tricky `safe` texts (transparent fees, negated wording) and boundary cases such as drip pricing vs. bait and switch. Full report: [reports/classification_report_v2.md](reports/classification_report_v2.md).
+
+| Test set | Regex | SetFit (one training run) |
+|---|---|---|
+| `test_set.csv` (70 items) | 0.829 | 0.929 |
+| `test_set_v2.csv` (245 items) | 0.465 | 0.829 |
+
+- **The v2 labels come from a single annotator (the drafter). Inter-annotator agreement was not measured.** The two-annotator workflow is in `docs/annotation_protocol_v2.md` and `scripts/annotation_agreement.py` and can be run later.
+- Regex accuracy drops by more than 35 points; on v2 it finds almost no confirm-shaming, drip-pricing or bait-and-switch items (recall 0.17, 0.11, 0.03).
+- SetFit's weak spots on v2: `safe` recall 0.51 and `subscription_trap` precision 0.57, meaning many safe texts are labelled as violations. The cause has not been investigated.
+- Some v2 errors may be label ambiguity and not model mistakes, since the labels were not cross-checked.
+
+### Larger test set (v2)
+
+`data/test_set_v2.csv` has 245 items (35 per class), including tricky `safe` texts (transparent fees, negated wording) and boundary cases such as drip pricing vs. bait and switch. Full report: [reports/classification_report_v2.md](reports/classification_report_v2.md).
+
+| Test set | Regex | SetFit (one training run) |
+|---|---|---|
+| `test_set.csv` (70 items) | 0.829 | 0.929 |
+| `test_set_v2.csv` (245 items) | 0.465 | 0.829 |
+
+- **The v2 labels come from a single annotator (the drafter). Inter-annotator agreement was not measured.** The two-annotator workflow is in `docs/annotation_protocol_v2.md` and `scripts/annotation_agreement.py` and can be run later.
+- Regex accuracy drops by more than 35 points; on v2 it finds almost no confirm-shaming, drip-pricing or bait-and-switch items (recall 0.17, 0.11, 0.03).
+- SetFit's weak spots on v2: `safe` recall 0.51 and `subscription_trap` precision 0.57, meaning many safe texts are labelled as violations. The cause has not been investigated.
+- Some v2 errors may be label ambiguity and not model mistakes, since the labels were not cross-checked.
 
 ### Observations and limitations
 

@@ -221,6 +221,22 @@ Key takeaways from real-world shopping copy:
 - At 20 examples per class every seed uses the same training data, so that row's spread reflects training randomness only.
 - Zero-shot is not plotted. Reproduce with `python scripts/learning_curve.py`.
 
+### Ablation: does each phase earn its place?
+
+Measured on the 70-item test set with the SetFit classifier (full report: [reports/ablation.md](reports/ablation.md)):
+
+| Design | Accuracy (auto-decided) | Reach transformer | ms / item |
+|---|---|---|---|
+| (a) classifier only | 0.942 | 70 | 3.1 |
+| (b) regex + classifier | 0.829 | 53 | 2.3 |
+| (c) regex + semantic + classifier | 0.942 | 63 | 200.3 |
+
+- The regex gate lost about 11 points of accuracy for a saving of about 0.8 ms per item: anything it misses is passed as safe without being classified.
+- The semantic gate recovered the accuracy but costs about 196 ms per item for the embedding step.
+- On short texts and this laptop, classifier-only was as accurate as the full design and about 65 times faster. A gate might still pay off with long documents or a much slower classifier, which this test does not measure.
+- Sweeping FLAG and REVIEW thresholds, accuracy stayed between 0.928 and 0.942 and at most 4.3% of items went to review; the current 0.7 / 0.5 setting sits on that plateau.
+- The test set was written by the same team as the lexicon, and one item is 1.4 points, so small differences are not reliable.
+
 ### Observations and limitations
 
 * **Zero-shot NLI struggles with health/eco claims** (recall 0.10). The NLI model reads

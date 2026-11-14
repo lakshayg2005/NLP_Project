@@ -1,4 +1,5 @@
-"""Phase 1: cheap, high-recall filter that decides whether text needs the transformer tier."""
+
+"""Phase 1: high-recall filter that decides whether text needs the transformer tier."""
 
 from dataclasses import dataclass, field
 
@@ -15,24 +16,44 @@ class HeuristicResult:
 
 
 def screen(text: str, use_semantic: bool = True) -> HeuristicResult:
-    """Return whether ``text`` is suspicious.
-
-    Regex runs first (microseconds). Only text that the regex layer considers clean is
-    embedded, so paraphrased dark patterns ("supplies are vanishing quickly") are still
-    caught without paying the embedding cost on every obviously risky listing.
-    """
+    """Return whether the supplied text contains a potential dark pattern."""
     hits = regex_hits(text)
+
     if hits:
-        return HeuristicResult(True, hits, reason="regex:" + ",".join(sorted(hits)))
+        return HeuristicResult(
+            suspicious=True,
+            regex_hits=hits,
+            reason="regex:" + ",".join(sorted(hits)),
+        )
 
     if use_semantic:
         from auditor.embeddings import semantic_scores
 
         threshold = get_settings().semantic_threshold
-        sem = semantic_scores(text)
-        triggered = sorted(c for c, r in sem.items() if r["score"] >= threshold)
-        if triggered:
-            return HeuristicResult(True, hits, sem, reason="semantic:" + ",".join(triggered))
-        return HeuristicResult(False, hits, sem, reason="clean")
+        semantic = semantic_scores(text)
+        triggered = sorted(
+            category
+            for category, result in semantic.items()
+            if result["score"] >= threshold
+        )
 
-    return HeuristicResult(False, hits, reason="clean")
+        if triggered:
+            return HeuristicResult(
+                suspicious=True,
+                regex_hits=hits,
+                semantic=semantic,
+                reason="semantic:" + ",".join(triggered),
+            )
+
+        return HeuristicResult(
+            suspicious=False,
+            regex_hits=hits,
+            semantic=semantic,
+            reason="clean",
+        )
+
+    return HeuristicResult(
+        suspicious=False,
+        regex_hits=hits,
+        reason="clean",
+    )

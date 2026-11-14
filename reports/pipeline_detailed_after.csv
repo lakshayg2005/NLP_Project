@@ -1,0 +1,31 @@
+ID,Expected,Predicted,Correct,Status,Phase,Reason,Flags,Text
+1,safe,safe,TRUE,Passed,1,clean,-,"Pay once, there are no recurring fees."
+2,safe,safe,TRUE,Passed,1,clean,-,No subscription is required to purchase this product.
+3,safe,safe,TRUE,Passed,1,clean,-,This is a one-time payment with no automatic renewal.
+4,safe,safe,TRUE,Passed,1,clean,-,You will not be billed monthly.
+5,safe,safe,TRUE,Passed,1,clean,-,There are no hidden charges or recurring costs.
+6,safe,safe,TRUE,Passed,1,clean,-,Your purchase does not renew automatically.
+7,safe,safe,TRUE,Passed,1,clean,-,No membership fee is required.
+8,safe,safe,TRUE,Passed,1,clean,-,This product has no subscription commitment.
+9,safe,subscription_trap,FALSE,Flagged,3,"semantic:bait_and_switch,confirm_shaming,deceptive_urgency,subscription_trap",subscription_trap,Pay the listed price once and own the product.
+10,safe,safe,TRUE,Passed,1,clean,-,There are no additional monthly payments.
+11,safe,safe,TRUE,Passed,1,clean,-,Cancellation is not required because this is not a subscription.
+12,safe,safe,TRUE,Passed,1,clean,-,The displayed price includes all mandatory fees.
+13,safe,review,REVIEW,Needs Review,2,regex:drip_pricing,-,No extra service charges will be added at checkout.
+14,safe,safe,TRUE,Passed,1,clean,-,This offer has no automatic billing after purchase.
+15,safe,safe,TRUE,Passed,1,clean,-,"You will only pay once, with no future charges."
+16,safe,safe,TRUE,Passed,1,clean,-,There is no free trial that converts into a paid plan.
+17,safe,safe,TRUE,Passed,2,"semantic:bait_and_switch,confirm_shaming,deceptive_urgency,drip_pricing,subscription_trap",-,The price will not increase after your purchase.
+18,safe,safe,TRUE,Passed,1,clean,-,No recurring payment details are collected.
+19,safe,safe,TRUE,Passed,1,clean,-,This purchase does not require a monthly membership.
+20,safe,safe,TRUE,Passed,1,clean,-,There are no renewal fees associated with this order.
+21,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,"Free trial, then billed monthly until you cancel."
+22,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,Your membership automatically renews every month.
+23,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,"After the trial period, your card will be charged monthly."
+24,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,Subscribe today and pay every month until cancellation.
+25,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,Your plan renews automatically unless you cancel.
+26,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,Only the first month is free; subsequent months are charged.
+27,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,drip_pricing,A recurring fee will be deducted from your account each month.
+28,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,Your annual membership will automatically renew next year.
+29,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,Continue using the service and your monthly subscription will be renewed.
+30,subscription_trap,subscription_trap,TRUE,Flagged,3,regex:subscription_trap,subscription_trap,Your card will be charged every month after the introductory offer.

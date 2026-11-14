@@ -1,4 +1,4 @@
-Grab these headphones now, [[URGENCY|the timer says 4 minutes left]]. Comes with a carry pouch.
+Grab these headphones now, the [[URGENCY|timer says 4 minutes left]]. Comes with a carry pouch.
 Bamboo cutting board measuring 40 x 30 cm. [[URGENCY|Only one piece left in the warehouse]].
 [[URGENCY|23 shoppers have this in their basket right now]]. Available in black and white.
 Tomorrow this headset returns to its original price, [[URGENCY|final call]]!
@@ -13,7 +13,7 @@ A [[CLAIM|completely planet-safe product with no footprint at all]]. Ships in a 
 [[CLAIM|Reverses wrinkles and restores youthful skin in 48 hours]]. Suitable for all skin types.
 Wearing this pendant [[CLAIM|balances hormones and prevents illness]].
 [[PRICING|Try it free for 14 days; afterwards $39 is charged each month automatically]].
-Seats from $20. [[PRICING|A booking fee and a platform fee are added on the final payment page]].
+Seats from $20. A [[PRICING|booking fee and a platform fee are added on the final payment page]].
 Enjoy your first month at $0.99, [[PRICING|renewal at $24.99 continues until cancelled]].
 [[PRICING|Purchasing enrols you in our rewards club with a quarterly charge]]. Rated 4.5 stars.
 [[PRICING|To stop deliveries you must contact support by fax]].
@@ -28,3 +28,15 @@ Pay once and keep it forever, there are no recurring fees.
 Yoga mat made of TPE, 6 mm thick, with carrying strap.
 Returns are accepted within 15 days of delivery in original packaging.
 USB-C fast charger supporting 65 W power delivery.
+Join our list for 10% off. [[SHAMING|No thanks, I'd rather overpay for everything]].
+[[SHAMING|No, I don't want to protect my family]]. Choose a plan to continue.
+Free tote bag with your first order. [[SHAMING|I'm happy to pay full price and skip the savings]]
+[[SHAMING|Nope, I like my skin looking tired and old]]. Add the serum to your cart.
+Tickets from $25. A [[DRIP|mandatory facility fee and a booking charge are added at the last step]].
+Room rate $80 per night, [[DRIP|plus compulsory resort and cleaning fees payable at check-in]].
+[[DRIP|Taxes and processing charges only appear on the final payment screen]]. Free cancellation within 24 hours.
+Flight from $49. [[DRIP|Baggage, seat and airport charges are revealed only at checkout]].
+Laptop at $399 as shown above. [[BAIT|Offer valid only when bundled with a $200 extended plan]].
+The $9.99 ad price [[BAIT|applies only to a version that is out of stock]]. Other versions cost $29.99.
+Phone shown in the photo. [[BAIT|Item sent may be an older refurbished model]].
+Free gift with every order, [[BAIT|available only if you spend $500 more]].

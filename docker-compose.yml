@@ -2,14 +2,47 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: auditor
-      POSTGRES_PASSWORD: auditor
-      POSTGRES_DB: compliance
+      POSTGRES_USER: ${POSTGRES_USER:-auditor}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-auditor}
+      POSTGRES_DB: ${POSTGRES_DB:-compliance}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./sql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./sql/demo_seed.sql:/docker-entrypoint-initdb.d/02_demo_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    command: ["uvicorn", "auditor.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment: &app-environment
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-auditor}:${POSTGRES_PASSWORD:-auditor}@postgres:5432/${POSTGRES_DB:-compliance}
+      SETFIT_MODEL_REPO: ${SETFIT_MODEL_REPO:-}
+      SPAN_MODEL_REPO: ${SPAN_MODEL_REPO:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./models:/app/models:ro
+
+  dashboard:
+    build: .
+    command: ["streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+    environment: *app-environment
+    ports:
+      - "8501:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./models:/app/models:ro
 
 volumes:
   pgdata:

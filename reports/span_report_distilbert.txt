@@ -1,0 +1,36 @@
+== dev (strict) ==
+type       precision    recall        f1  support
+micro          0.987     0.992     0.990      380
+BAIT           1.000     1.000     1.000       72
+CLAIM          1.000     1.000     1.000       69
+DRIP           1.000     1.000     1.000       64
+PRICING        1.000     1.000     1.000       55
+SHAMING        0.981     0.981     0.981       52
+URGENCY        0.943     0.971     0.957       68
+== dev (lenient) ==
+type       precision    recall        f1  support
+micro          0.997     1.000     0.999      380
+BAIT           1.000     1.000     1.000       72
+CLAIM          1.000     1.000     1.000       69
+DRIP           1.000     1.000     1.000       64
+PRICING        1.000     1.000     1.000       55
+SHAMING        1.000     1.000     1.000       52
+URGENCY        0.986     1.000     0.993       68
+== test (strict) ==
+type       precision    recall        f1  support
+micro          0.347     0.436     0.386       39
+BAIT           0.250     0.250     0.250        4
+CLAIM          0.556     0.556     0.556        9
+DRIP           0.125     0.250     0.167        4
+PRICING        0.200     0.222     0.211        9
+SHAMING        1.000     1.000     1.000        4
+URGENCY        0.286     0.444     0.348        9
+== test (lenient) ==
+type       precision    recall        f1  support
+micro          0.755     0.846     0.798       39
+BAIT           1.000     1.000     1.000        4
+CLAIM          1.000     1.000     1.000        9
+DRIP           0.500     0.750     0.600        4
+PRICING        0.500     0.556     0.526        9
+SHAMING        1.000     1.000     1.000        4
+URGENCY        0.786     0.889     0.834        9

@@ -86,13 +86,13 @@ forced action, subscription trap, interface interference, bait and switch, drip 
 disguised advertisement, nagging, trick wording, SaaS billing, rogue malware).
 
 **Tasks**
-- [ ] Pick the patterns that are detectable from text (at least 3 new ones, e.g. confirm-shaming, drip pricing, bait and switch)
-- [ ] Add them in `auditor/taxonomy.py` (key, name, BIO tag, NLI hypothesis)
-- [ ] Add regex patterns and phrase-bank entries in `auditor/lexicon.py`
-- [ ] Add 20 labelled examples per new category to `data/seed_corpus.csv`, plus 10 per category to `data/test_set.csv`
-- [ ] Add annotated sentences to `data/span_seed.txt`
+- [x] Pick the patterns that are detectable from text (at least 3 new ones, e.g. confirm-shaming, drip pricing, bait and switch)
+- [x] Add them in `auditor/taxonomy.py` (key, name, BIO tag, NLI hypothesis)
+- [x] Add regex patterns and phrase-bank entries in `auditor/lexicon.py`
+- [x] Add 20 labelled examples per new category to `data/seed_corpus.csv`, plus 10 per category to `data/test_set.csv`
+- [x] Add annotated sentences to `data/span_seed.txt`
 - [ ] Retrain (`scripts/train_setfit.py`, `scripts/generate_span_data.py`, `scripts/train_span_extractor.py`) and update `tests/`
-- [ ] Update dashboard colours in `dashboard/app.py`
+- [x] Update dashboard colours in `dashboard/app.py`
 
 **Acceptance criteria:** all tests pass; new categories appear in the dashboard; before/after results table.
 
@@ -104,9 +104,9 @@ disguised advertisement, nagging, trick wording, SaaS billing, rogue malware).
 Known failure: "Pay once, there are no recurring fees" is flagged as a subscription trap with high confidence.
 
 **Tasks**
-- [ ] Collect 30+ negated and reassuring examples ("no hidden fees", "cancel anytime", "not clinically tested", "does not auto-renew")
-- [ ] Add them as `safe` examples to `data/seed_corpus.csv` and as hard negatives in `scripts/generate_span_data.py`
-- [ ] Optionally add a negation check in `auditor/heuristics.py` or `auditor/extractor.py`
+- [x] Collect 30+ negated and reassuring examples ("no hidden fees", "cancel anytime", "not clinically tested", "does not auto-renew")
+- [x] Add them as `safe` examples to `data/seed_corpus.csv` and as hard negatives in `scripts/generate_span_data.py`
+- [x] Optionally add a negation check in `auditor/heuristics.py` or `auditor/extractor.py`
 - [ ] Retrain and compare before and after on a dedicated negation test set, `data/negation_test.csv`
 
 **Acceptance criteria:** the example above is classified as safe, and overall test accuracy does not drop.
@@ -119,7 +119,7 @@ Known failure: "Pay once, there are no recurring fees" is flagged as a subscript
 Indian marketplaces mix Hindi and English ("Jaldi karo, sirf 2 bache hain!").
 
 **Tasks**
-- [ ] Write 15+ Hinglish examples per category (Roman script) and 40 for a test set
+- [x] Write 15+ Hinglish examples per category (Roman script) and 40 for a test set
 - [ ] Measure how the current model performs on them (baseline)
 - [ ] Try a multilingual base model (e.g. `paraphrase-multilingual-mpnet-base-v2`) in `scripts/train_setfit.py` via `--base-model`
 - [ ] Report accuracy for the English-only vs multilingual model on both English and Hinglish test sets
@@ -134,14 +134,15 @@ Indian marketplaces mix Hindi and English ("Jaldi karo, sirf 2 bache hain!").
 Exact-boundary F1 is 0.41 against 0.92 overlap F1: the model finds the right phrase but the edges differ.
 
 **Tasks**
-- [ ] Review the failures in `reports/classification_report.md` and write down the annotation rules (e.g. include leading "the"? include the trailing number?) in `docs/annotation_guide.md`
-- [ ] Re-annotate `data/span_test.txt` and `data/span_seed.txt` consistently with the guide
+- [x] Review the failures in `reports/classification_report.md` and write down the annotation rules (e.g. include leading "the"? include the trailing number?) in `docs/annotation_guide.md`
+- [x] Re-annotate `data/span_test.txt` and `data/span_seed.txt` consistently with the guide
 - [ ] Try a larger base model (e.g. `roberta-base`) with `--base-model`, and compare
 - [ ] Report strict and lenient F1 before and after
 
 **Acceptance criteria:** annotation guide committed; strict F1 improves or a clear explanation of why not.
 
 ---
+
 
 ## Workstream C: Engineering and delivery
 

@@ -1,0 +1,43 @@
+text,label
+"Abhi order karo, sirf 4 piece bache hain!",deceptive_urgency
+"Deal 15 minute mein khatam ho jayegi, jaldi karein.",deceptive_urgency
+"Is waqt 40 log yeh item dekh rahe hain, der mat karo.",deceptive_urgency
+Aaj raat ke baad yeh offer dobara nahi aayega.,deceptive_urgency
+"Timer chal raha hai, last 3 units bache hain!",deceptive_urgency
+"Sale ka aakhri din hai, aaj hi khareedein.",deceptive_urgency
+Yeh juice peene se kainser jaisi bimari bhi theek ho jati hai.,unsubstantiated_claims
+"100% natural aur chemical-free, isse har dard khatam hota hai.",unsubstantiated_claims
+Sirf 10 din mein 8 kilo wazan kam karne ki guarantee.,unsubstantiated_claims
+Yeh mask coronavirus se pakki suraksha deta hai.,unsubstantiated_claims
+"Humare product ka environment par zero asar hai, bilkul planet-safe.",unsubstantiated_claims
+Is tel se gunjapan 2 hafte mein jad se khatam ho jata hai.,unsubstantiated_claims
+"Pehle 7 din free, phir har mahine Rs 399 aapke card se kat jayenge.",subscription_trap
+Plan cancel karna ho toh aapko hamare office aana padega.,subscription_trap
+Order karte hi aap hamari monthly membership mein add ho jate hain.,subscription_trap
+Trial ke baad subscription apne aap renew ho jayega.,subscription_trap
+"Warranty plan cart mein pehle se jud chuka hai, hatane ke liye alag se click karein.",subscription_trap
+Har saal aapka plan automatically renew hoga jab tak aap band na karein.,subscription_trap
+"Nahi, mujhe apne bachon ki padhai ki parwah nahi hai.",confirm_shaming
+"Nahi chahiye, main zyada daam dena hi pasand karta hoon.",confirm_shaming
+"Rehne do, mujhe bachat karna aata hi nahi.",confirm_shaming
+"Nahi, main ek smart khareedar nahi banna chahta.",confirm_shaming
+"Nahi dhanyavaad, mujhe apni sehat bigadni hai.",confirm_shaming
+"Skip, mujhe free shipping se nafrat hai.",confirm_shaming
+Dikhaye gaye daam par convenience fee aur GST checkout par alag se jode jayenge.,drip_pricing
+Final payment page par platform charge aur packaging fee dikhai dengi.,drip_pricing
+Resort fee aur cleaning charge hotel pahunchne par alag se dene honge.,drip_pricing
+"Price mein delivery fee shamil nahi hai, woh aakhri step par lagegi.",drip_pricing
+Seat selection fee aur baggage charge sirf payment ke waqt pata chalte hain.,drip_pricing
+Mandatory service charge dikhaye gaye rate se alag add hota hai.,drip_pricing
+Yeh discount sirf tab milega jab aap premium upgrade lenge.,bait_and_switch
+"Dikhaya gaya phone khatam ho chuka hai, uski jagah mehnga model bheja jayega.",bait_and_switch
+"Rs 499 ka offer sirf basic size par lagu hai, asli saman ka daam alag hai.",bait_and_switch
+"Free gift ke liye aapko Rs 2,000 ka aur saman lena padega.",bait_and_switch
+Photo mein dikha item aur aapko bheja gaya item alag hoga.,bait_and_switch
+"Offer ka price sirf store mein hai, online order par standard rate lagega.",bait_and_switch
+Yeh mixer grinder 750 watt ka hai aur teen jar ke saath aata hai.,safe
+Aap order 7 din ke andar return kar sakte hain.,safe
+Is kurte ka fabric soft cotton hai aur size S se XXL tak milta hai.,safe
+"Koi extra fee nahi, price mein GST shamil hai.",safe
+"Ek baar kharidein, koi subscription ya monthly charge nahi.",safe
+Delivery aapke pate par 4 din mein ho jayegi.,safe

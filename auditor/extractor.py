@@ -22,15 +22,48 @@ log = logging.getLogger(__name__)
 _CONNECTOR = re.compile(r"^[\s,;:\-–]*(?:(?:and|or|but|with|while|to|&)[\s,;:\-–]*)?$", re.IGNORECASE)
 
 
+_EDGE_LEAD = re.compile(
+    r"^(?:[\s,;:.!?\-\u2013\u2014]+|(?:the|a|an|this|that|these|those|our|your|my|their|its|and|or|but|so|then)\s+)",
+    re.IGNORECASE,
+)
+_EDGE_TRAIL = re.compile(r"(?:[\s,;:.!?\-\u2013\u2014]+|\s+(?:and|or|but|so|then))$", re.IGNORECASE)
+
+
+def normalize_boundaries(text: str, spans: list[dict]) -> list[dict]:
+    """Apply the edge rules of ``docs/annotation_guide.md`` (R1-R3) to predicted spans.
+
+    Leading articles, demonstratives, possessives and connectives, and edge punctuation,
+    are not part of a span. Models trained on mixed conventions drift on exactly these
+    words, so snapping them off is a cheap way to improve strict F1.
+    """
+    out = []
+    for span in spans:
+        start, end = span["start"], span["end"]
+        changed = True
+        while changed and start < end:
+            changed = False
+            m = _EDGE_LEAD.match(text[start:end])
+            if m and m.end() < end - start:
+                start += m.end()
+                changed = True
+            m = _EDGE_TRAIL.search(text[start:end])
+            if m and m.start() > 0:
+                end = start + m.start()
+                changed = True
+        out.append({**span, "start": start, "end": end})
+    return out
+
+
 class TransformerSpanExtractor:
     name = "token_classifier"
 
-    def __init__(self, model_dir, min_score: float = 0.6):
+    def __init__(self, model_dir, min_score: float = 0.6, normalize: bool = True):
         from transformers import pipeline
 
         from auditor.classifier import _device
 
         self.min_score = min_score
+        self.normalize = normalize
         # "first": each word takes the label of its first sub-token, which avoids
         # spans that start or stop in the middle of a word.
         self._pipe = pipeline(
@@ -54,6 +87,8 @@ class TransformerSpanExtractor:
                 "source": self.name,
             })
         spans = _join_fragments(text, _expand_to_words(text, merge_spans(spans)))
+        if self.normalize:
+            spans = normalize_boundaries(text, spans)
         return [s for s in spans if s["score"] >= self.min_score and _has_word(text, s)]
 
 

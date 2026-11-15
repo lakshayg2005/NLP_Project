@@ -12,7 +12,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import auditor  # noqa: F401, E402
-import torch  # noqa: F401, E402
+
+try:  # preloads torch's DLLs on Windows; evaluating regex-only needs no torch
+    import torch  # noqa: F401, E402
+except ImportError:
+    pass
 
 import argparse  # noqa: E402
 import pandas as pd  # noqa: E402
@@ -123,6 +127,8 @@ def main():
         df = pd.read_csv(args.data)
         data_desc = f"`{args.data.name}` ({len(df)} examples)"
         out = PROJECT_ROOT / "reports" / "classification_report.md"
+    if args.out:
+        out = args.out
 
     if args.out and not args.princeton:
         out = args.out
@@ -149,7 +155,10 @@ def main():
         else:
             raise SystemExit(f"Unknown system {system}")
         ms = (time.perf_counter() - t0) * 1000 / len(texts)
-        acc, f1 = accuracy_score(labels, preds), f1_score(labels, preds, average="macro", zero_division=0)
+        acc = accuracy_score(labels, preds)
+        # macro over classes present in the gold labels, so a class with no gold items (e.g. `safe` on
+        # Princeton, which has no safe texts) cannot drag the average down with a meaningless 0 F1
+        f1 = f1_score(labels, preds, labels=eval_labels, average="macro", zero_division=0)
         summary.append((system, acc, f1, ms))
         report = classification_report(labels, preds, labels=eval_labels, digits=3, zero_division=0)
         sections.append(f"## {system}\n\n```\n{report}```\n")
@@ -178,12 +187,12 @@ def main():
     if "spans" in args.systems and not args.princeton:
         sections.append(evaluate_spans())
 
-    if args.princeton and failures_by_system:
-        # Add detailed error analysis with representative failure examples
+    if args.princeton and "regex" in failures_by_system:
+        # Hand-written root-cause analysis; it describes regex failures, so only emit it for that system
         ex_lines = [
             "## Real-World Failure Analysis (Princeton Dataset)\n",
-            "Below are representative failure cases from real-world shopping sites where the model "
-            "missed dark patterns, along with root-cause explanations:\n",
+            "Below are representative failure cases of the regex baseline on real-world shopping sites, "
+            "along with root-cause explanations:\n",
         ]
         sample_fails = [
             (
@@ -230,6 +239,19 @@ def main():
             ex_lines.append(f"- **Why it fails:** {expl}\n")
 
         sections.append("\n".join(ex_lines))
+
+    if args.princeton:
+        for system, fails in failures_by_system.items():
+            if system == "regex" or not fails:
+                continue
+            lines = [f"## Failure examples: {system} (Princeton)\n",
+                     f"{len(fails)} items misclassified; the first 10 are listed. Replace each placeholder with "
+                     "a one-line root-cause explanation before citing these in the README or report.\n"]
+            for i, f in enumerate(fails[:10], 1):
+                lines += [f"### {system} failure {i}: {f['category']} / {f['type']}",
+                          f"- **Text:** `{f['text']}`", f"- **Gold label:** `{f['gold']}`",
+                          f"- **Predicted:** `{f['pred']}`", "- **Why it fails:** _(to be written)_\n"]
+            sections.append("\n".join(lines))
 
     out.parent.mkdir(exist_ok=True)
     out.write_text("\n".join(sections), encoding="utf-8")

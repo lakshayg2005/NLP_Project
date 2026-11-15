@@ -1,0 +1,70 @@
+text,label
+"Pay once, there are no recurring fees.",safe
+No hidden fees or surprise charges.,safe
+This offer does not auto-renew.,safe
+"Cancel anytime, no questions asked.",safe
+There is no subscription and no long-term commitment.,safe
+This product has not been clinically tested and makes no health claims.,safe
+You won't be billed monthly; it's a single payment.,safe
+No countdown timers here; the price stays the same.,safe
+We don't add handling fees at checkout.,safe
+No extra charges will be added to your order.,safe
+Our price is not a limited-time offer.,safe
+"Stock is not limited, we restock every week.",safe
+It does not cure or treat any disease.,safe
+"No toxins, no gimmicks, just plain cotton.",safe
+This is not a detox product.,safe
+Your card will not be charged automatically.,safe
+No membership or club enrollment is required.,safe
+Nothing is pre-selected at checkout.,safe
+There are no service fees on this order.,safe
+"Free shipping, no minimum spend and no hidden conditions.",safe
+The listed price is not subject to any surcharge.,safe
+We do not guarantee weight loss; results vary.,safe
+"No contract required, leave whenever you like.",safe
+This discount is not tied to any upgrade or bundle.,safe
+You will not be charged until you choose a plan.,safe
+"No pressure to buy today, the price won't change.",safe
+"Not sold out, plenty in stock.",safe
+The item shipped is not a replica; it matches the photo.,safe
+Declining this offer has no effect on your order.,safe
+No recurring billing and no auto-shipments.,safe
+"No thanks, I hate saving money and prefer paying full price.",confirm_shaming
+"Don't miss out, only 2 left in stock!",deceptive_urgency
+"Free trial, then $29.99 billed monthly, and you cannot cancel online.",subscription_trap
+There is no way to avoid the mandatory resort fee added at checkout.,drip_pricing
+You will not know the final price until the last page; fees are added at checkout.,drip_pricing
+"Not available at this price after midnight, offer ends in 10 minutes!",deceptive_urgency
+"Refunds are not offered after the free trial, then $19.99 is billed each month.",subscription_trap
+You can't cancel by email; cancellation requires a phone call during business hours.,subscription_trap
+"No problem, just pay a mandatory convenience fee at checkout.",drip_pricing
+Advertised price not available in store; it applies only if you upgrade to platinum.,bait_and_switch
+No subscription is required to purchase this product.,safe
+This is a one-time payment with no automatic renewal.,safe
+You will not be billed monthly.,safe
+There are no hidden charges or recurring costs.,safe
+Your purchase does not renew automatically.,safe
+No membership fee is required.,safe
+This product has no subscription commitment.,safe
+Pay the listed price once and own the product.,safe
+There are no additional monthly payments.,safe
+Cancellation is not required because this is not a subscription.,safe
+The displayed price includes all mandatory fees.,safe
+No extra service charges will be added at checkout.,safe
+This offer has no automatic billing after purchase.,safe
+"You will only pay once, with no future charges.",safe
+There is no free trial that converts into a paid plan.,safe
+The price will not increase after your purchase.,safe
+No recurring payment details are collected.,safe
+This purchase does not require a monthly membership.,safe
+There are no renewal fees associated with this order.,safe
+"Free trial, then billed monthly until you cancel.",subscription_trap
+Your membership automatically renews every month.,subscription_trap
+"After the trial period, your card will be charged monthly.",subscription_trap
+Subscribe today and pay every month until cancellation.,subscription_trap
+Your plan renews automatically unless you cancel.,subscription_trap
+Only the first month is free; subsequent months are charged.,subscription_trap
+A recurring fee will be deducted from your account each month.,subscription_trap
+Your annual membership will automatically renew next year.,subscription_trap
+Continue using the service and your monthly subscription will be renewed.,subscription_trap
+Your card will be charged every month after the introductory offer.,subscription_trap

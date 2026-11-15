@@ -3,6 +3,15 @@
     python scripts/generate_span_data.py
     python scripts/train_span_extractor.py --epochs 3
 
+Compare base models (issue B4); each run writes its own model folder and report:
+
+    python scripts/train_span_extractor.py --base-model distilbert-base-uncased \
+        --output models/span_distilbert --report reports/span_report_distilbert.txt
+    python scripts/train_span_extractor.py --base-model roberta-base \
+        --output models/span_roberta --report reports/span_report_roberta.txt
+    python scripts/span_boundary_report.py --model distilbert=models/span_distilbert \
+        --model roberta=models/span_roberta
+
 Evaluates entity-level precision/recall/F1 (seqeval) on the synthetic dev split and on
 the hand-annotated ``data/span_test.txt``.
 """
@@ -55,6 +64,8 @@ def main():
     parser.add_argument("--lr", type=float, default=5e-5)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--output", type=Path, default=get_settings().span_model_dir)
+    parser.add_argument("--report", type=Path, default=PROJECT_ROOT / "reports" / "span_extractor_report.txt")
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
     from datasets import Dataset
@@ -107,7 +118,7 @@ def main():
             logging_steps=50,
             weight_decay=0.01,
             report_to=[],
-            seed=42,
+            seed=args.seed,
         ),
         train_dataset=datasets["train"],
         eval_dataset=datasets["dev"],
@@ -128,9 +139,8 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     trainer.save_model(str(args.output))
     tokenizer.save_pretrained(str(args.output))
-    reports = PROJECT_ROOT / "reports"
-    reports.mkdir(exist_ok=True)
-    (reports / "span_extractor_report.txt").write_text("\n".join(report_lines), encoding="utf-8")
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    args.report.write_text("\n".join(report_lines), encoding="utf-8")
     print(f"Saved span extractor to {args.output}")
 
 

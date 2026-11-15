@@ -1,13 +1,8 @@
-"""Hand-curated risk lexicon.
 
-* ``PATTERNS`` - regular expressions used by the Phase 1 heuristic filter and by the
-  rule-based fallback span extractor. They are tuned for *recall*: false positives are
-  cheap because the transformer layer re-checks them, false negatives are not.
-* ``PHRASE_BANK`` - prototypical manipulative phrases per category. Their sentence
-  embeddings let Phase 1 catch paraphrases that contain none of the banned keywords.
-"""
+"""Hand-curated risk lexicon."""
 
 import re
+
 
 _URGENCY = [
     r"\bhurry\b",
@@ -65,6 +60,9 @@ _PRICING = [
     r"\bcommitment\b|\bcontract\b|\btermination fees?\b",
     r"\bthen\b.{0,40}\b(?:full price|renews?|charged)\b|\bafterwards\b|\bthereafter\b",
     r"\$\s?\d+(?:\.\d{2})?\s*\*",
+    r"\b(?:subsequent|following)\s+months?\s+(?:are|will\s+be)\s+charged\b",
+    r"\b(?:card|account)\s+(?:will\s+be\s+)?charged\s+(?:every|each)\s+month\b",
+    r"\bcharged\s+(?:every|each)\s+month\b",
 ]
 
 _SHAMING = [
@@ -171,14 +169,109 @@ PHRASE_BANK: dict[str, list[str]] = {
 }
 
 
-def regex_hits(text: str) -> dict[str, list[tuple[int, int, str]]]:
-    """Return ``{category: [(start, end, matched_text), ...]}`` for every pattern hit."""
+_SAFE_PRICING_CONTEXT = [
+    re.compile(
+        r"\bno\s+(?:(?:any|hidden|extra|additional|recurring|monthly|membership|"
+        r"subscription|automatic|renewal|service|handling|booking|convenience)\s+){0,4}"
+        r"(?:fees?|charges?|costs?|payments?|subscription|membership|renewals?|billing)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bno\s+(?:subscription|membership)\s+(?:is\s+)?(?:required|needed)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:not|never)\s+(?:a\s+)?subscription\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:not|never|does not|doesn't|will not|won't|is not|isn't)\s+"
+        r"(?:be\s+)?(?:automatically\s+)?(?:renew(?:ed|s)?|billed|charged|recur)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:one[- ]time payment|pay once|single payment)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bno\s+free\s+trial\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\bprice\s+includes?\s+(?:all|every)\s+(?:mandatory\s+)?(?:fees?|charges?)\b",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"\b(?:does not|doesn't|do not|don't|will not|won't|is not|isn't)\s+"
+        r"(?:require|need)\s+(?:a\s+)?(?:monthly\s+)?"
+        r"(?:subscription|membership)\b",
+        re.IGNORECASE,
+    ),
+]
+
+def _sentence_for_match(text: str, start: int, end: int) -> str:
+    """Return the sentence-like segment containing a regex match."""
+    left = max(
+        text.rfind(".", 0, start),
+        text.rfind("!", 0, start),
+        text.rfind("?", 0, start),
+        text.rfind(";", 0, start),
+        text.rfind("\n", 0, start),
+    ) + 1
+
+    boundaries = [
+        position
+        for marker in (".", "!", "?", ";", "\n")
+        if (position := text.find(marker, end)) != -1
+    ]
+    right = min(boundaries) if boundaries else len(text)
+
+    return text[left:right]
+
+
+def _is_safe_pricing_context(text: str, start: int, end: int) -> bool:
+    """Ignore pricing keyword hits when their local sentence clearly negates risk."""
+    sentence = _sentence_for_match(text, start, end)
+
+    return any(pattern.search(sentence) for pattern in _SAFE_PRICING_CONTEXT)
+
+
+# Categories whose phrases are negative by design ("No thanks, I hate saving money"),
+# so a leading "no" must not cancel the hit.
+NEGATION_EXEMPT = {"confirm_shaming"}
+# Categories where an explicit "no extra fees / one-time payment" statement cancels a hit.
+_SAFE_CONTEXT_CATEGORIES = {"subscription_trap", "drip_pricing"}
+
+
+def regex_hits(text: str, skip_negated: bool = True) -> dict[str, list[tuple[int, int, str]]]:
+    """Return ``{category: [(start, end, matched_text), ...]}`` for every pattern hit.
+
+    With ``skip_negated`` (default) two filters drop reassuring copy: the explicit
+    safe-pricing statements ("pay once", "no subscription is required") and a general
+    negation check (``auditor.negation``) for hits preceded by a cue such as "no hidden
+    fees" or "does not auto-renew". Pass ``False`` for the raw lexicon matches, which is
+    the pre-B2 behaviour used for the before/after comparison.
+    """
+    from auditor.negation import is_negated
+
     hits: dict[str, list[tuple[int, int, str]]] = {}
+
     for category, patterns in PATTERNS.items():
         found = []
+
         for pattern in patterns:
-            for m in pattern.finditer(text):
-                found.append((m.start(), m.end(), m.group(0)))
+            for match in pattern.finditer(text):
+                if skip_negated:
+                    if category in _SAFE_CONTEXT_CATEGORIES and _is_safe_pricing_context(
+                        text, match.start(), match.end()
+                    ):
+                        continue
+                    if category not in NEGATION_EXEMPT and is_negated(text, match.start()):
+                        continue
+
+                found.append((match.start(), match.end(), match.group(0)))
+
         if found:
             hits[category] = sorted(set(found))
+
     return hits

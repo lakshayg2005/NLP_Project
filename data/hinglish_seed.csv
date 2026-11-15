@@ -1,0 +1,106 @@
+text,label
+"Jaldi karo, sirf 2 bache hain!",deceptive_urgency
+"Offer sirf aaj raat 12 baje tak valid hai, abhi order karo.",deceptive_urgency
+"Sirf 3 piece stock mein bache hain, der mat karo.",deceptive_urgency
+"Timer khatam hone se pehle kharid lo, warna deal chali jayegi.",deceptive_urgency
+Abhi 25 log is product ko dekh rahe hain.,deceptive_urgency
+Yeh sale 10 minute mein khatam ho rahi hai!,deceptive_urgency
+Aakhri mauka! Is price par dobara nahi milega.,deceptive_urgency
+"Stock jaldi khatam ho raha hai, abhi book karo.",deceptive_urgency
+"Aaj ka hi offer hai, kal price badh jayega.",deceptive_urgency
+"Sirf aaj ke liye, flat 70% off, jaldi karo!",deceptive_urgency
+"Countdown chal raha hai, sirf 5 minute bache hain.",deceptive_urgency
+"Kuch hi units bache hain, miss mat karna.",deceptive_urgency
+Aapka cart sirf 5 minute ke liye reserve hai.,deceptive_urgency
+Abhi order nahi kiya toh deal haath se nikal jayegi.,deceptive_urgency
+"Flash sale khatam hone wali hai, last 2 piece available.",deceptive_urgency
+Yeh chai pine se 3 din mein pet ki charbi gayab ho jati hai.,unsubstantiated_claims
+"Clinically proven, yeh tel gunjapan 100% theek kar deta hai.",unsubstantiated_claims
+"Yeh capsule har bimari ka ilaaj hai, bilkul natural.",unsubstantiated_claims
+"Sirf 7 din mein 10 kilo wazan kam karein, guarantee ke saath.",unsubstantiated_claims
+Yeh product 100% eco-friendly hai aur environment par koi asar nahi daalta.,unsubstantiated_claims
+Is cream se jhurriyan 48 ghante mein khatam ho jati hain.,unsubstantiated_claims
+"Yeh nuskha diabetes ko jad se khatam kar deta hai, doctors bhi hairan hain.",unsubstantiated_claims
+Yeh spray corona virus ko turant maar deta hai.,unsubstantiated_claims
+Humara detox juice sharir se saare toxins nikal deta hai.,unsubstantiated_claims
+Is gadde se kamar dard hamesha ke liye gayab ho jata hai.,unsubstantiated_claims
+Bilkul chemical-free aur planet ke liye 100% safe product.,unsubstantiated_claims
+Yeh jadui tel baal jhadna band karke naye baal ugata hai.,unsubstantiated_claims
+"Is supplement se aapki immunity kabhi kamzor nahi hogi, scientifically proven.",unsubstantiated_claims
+"Migraine aur anxiety ka pakka ilaaj, dawai ki zaroorat nahi.",unsubstantiated_claims
+"Zero carbon footprint, yeh bottle prakriti ko bachati hai.",unsubstantiated_claims
+"Pehla mahina free, uske baad har mahine Rs 499 kat jayenge.",subscription_trap
+Free trial ke baad aapka card automatically charge hoga.,subscription_trap
+Membership har mahine apne aap renew ho jati hai jab tak aap cancel na karein.,subscription_trap
+Cancel karne ke liye aapko customer care ko phone karna padega.,subscription_trap
+Order karte hi aap hamare VIP club mein enroll ho jate hain.,subscription_trap
+Trial khatam hone par plan saalana billing mein badal jayega.,subscription_trap
+Cart mein extended warranty pehle se select ki gayi hai.,subscription_trap
+"Subscription band karne ka option nahi hai, email bhejna padega.",subscription_trap
+"Rs 99 mein shuru karein, uske baad Rs 899 prati mahina.",subscription_trap
+Har 30 din mein aapke account se paise apne aap kat jayenge.,subscription_trap
+Free sample ke baad monthly shipment chalu ho jayegi.,subscription_trap
+Auto-renewal band karne ke liye 30 din pehle likh kar batana hoga.,subscription_trap
+Agle mahine se aapko monthly plan par shift kar diya jayega.,subscription_trap
+Is offer ke saath 12 mahine ka commitment zaroori hai.,subscription_trap
+Aapki membership tab tak chalti rahegi jab tak aap use cancel na karein.,subscription_trap
+"Nahi, mujhe paise bachana pasand nahi hai.",confirm_shaming
+"Nahi dhanyavaad, main full price hi dena chahta hoon.",confirm_shaming
+"Nahi, mujhe apni sehat ki koi parwah nahi.",confirm_shaming
+"Nahi chahiye, main discount ke laayak nahi hoon.",confirm_shaming
+"Nahi, main hamesha zyada paise dena pasand karta hoon.",confirm_shaming
+"Skip karo, mujhe free gift ki zaroorat nahi, main ameer hoon.",confirm_shaming
+"Nahi, main apne parivaar ko surakshit nahi rakhna chahta.",confirm_shaming
+"Nahi thanks, mujhe sasta saman pasand hi nahi.",confirm_shaming
+"Main chahta hoon ki mera bill zyada aaye, offer chhod do.",confirm_shaming
+"Nahi, main smart shopping nahi karna chahta.",confirm_shaming
+"Nahi, mujhe achhi deals se nafrat hai.",confirm_shaming
+"Nahi chahiye, main paise barbaad karna pasand karta hoon.",confirm_shaming
+"Nahi, main apni skin ko kharab hi rakhna chahti hoon.",confirm_shaming
+"Nahi, main aise hi theek hoon, mujhe bachat nahi chahiye.",confirm_shaming
+"Nahi dhanyavaad, main sabse mehnga option hi lunga.",confirm_shaming
+"Price sirf Rs 999 dikh raha hai, convenience fee checkout par jodi jayegi.",drip_pricing
+Handling charge aur platform fee aakhri payment page par add hote hain.,drip_pricing
+Delivery fee aur packaging charge order confirm karte waqt dikhaye jayenge.,drip_pricing
+Dikhaye gaye rate mein zaroori resort fee shamil nahi hai.,drip_pricing
+Tax aur service charge sirf payment screen par pata chalte hain.,drip_pricing
+"Base fare Rs 2,499 hai, baaki sab charges checkout par lagenge.",drip_pricing
+Booking fee aur GST aakhri step mein add kiye jayenge.,drip_pricing
+Total amount mein cleaning fee alag se check-in par bill hogi.,drip_pricing
+Aapko final price tab pata chalega jab aap payment karne wale honge.,drip_pricing
+Zaroori surcharge dikhaye gaye daam mein nahi joda gaya hai.,drip_pricing
+Airport fee aur seat charge sirf payment ke waqt dikhte hain.,drip_pricing
+Order ke aakhir mein internet handling fee jodi jayegi.,drip_pricing
+"Price mein platform fee shamil nahi, woh checkout par lagegi.",drip_pricing
+Processing charge aur COD fee last page par dikhai jayegi.,drip_pricing
+Dikhai gayi keemat mein mandatory service fees nahi hain.,drip_pricing
+Dikhaya gaya offer sirf premium plan lene par hi milta hai.,bait_and_switch
+"Photo wala model stock mein nahi hai, aapko mehnga model diya jayega.",bait_and_switch
+"Rs 199 wala deal sirf tab milega jab aap Rs 1,000 ka bundle kharidenge.",bait_and_switch
+"Advertised phone available nahi hai, uski jagah refurbished phone bheja jayega.",bait_and_switch
+"Discount sirf naye contract par lagu hota hai, purane customers ko nahi.",bait_and_switch
+"Special price sirf basic version par hai, asli product ka rate double hai.",bait_and_switch
+Free gift tabhi milega jab aap ek mehnga add-on bhi lenge.,bait_and_switch
+"Tasveer mein dikhaya gaya sample alag hai, bheja gaya item kam quality ka hoga.",bait_and_switch
+"Offer wala laptop out of stock hai, aapko upgrade karna padega.",bait_and_switch
+"Yeh sasta rate sirf store mein hai, online order par alag price lagega.",bait_and_switch
+Zero down payment offer ke liye mehngi insurance lena zaroori hai.,bait_and_switch
+"Jo item dikhaya gaya hai woh bik chuka hai, uski jagah mehnga option cart mein dal diya jayega.",bait_and_switch
+Introductory rate checkout par badalkar standard rate ho jata hai.,bait_and_switch
+Discount voucher sirf tab chalega jab aap hamare premium tier par switch karein.,bait_and_switch
+"Dikhai gayi price sirf aadhe saman ki hai, poora set lene par double dena padega.",bait_and_switch
+Yeh stainless steel ki bottle 750 ml ki hai.,safe
+Delivery 3 se 5 kaam ke dinon mein ho jati hai.,safe
+Order ke saath user manual aur charger milta hai.,safe
+30 din ke andar free return available hai.,safe
+"Yeh jeans 100% cotton se bani hai, machine wash kar sakte hain.",safe
+Customer support hafte ke saaton din uplabdh hai.,safe
+"Price mein sabhi tax shamil hain, koi extra charge nahi.",safe
+"Ek baar payment karein, koi monthly fee nahi.",safe
+"Aap kabhi bhi cancel kar sakte hain, koi penalty nahi.",safe
+Battery ek charge mein lagbhag 10 ghante chalti hai.,safe
+Yeh jootay black aur brown rang mein milte hain.,safe
+Is product par 1 saal ki warranty hai.,safe
+Packaging recycled cardboard se bani hai.,safe
+Yeh laptop stand adjustable hai aur 15 inch tak ke laptop ke liye fit hota hai.,safe
+"Koi hidden charge nahi hai, jo price dikh raha hai wahi dena hai.",safe

@@ -65,3 +65,50 @@ def test_join_fragments():
     ]
     [joined] = _join_fragments(text, spans)
     assert text[joined["start"]:joined["end"]] == "balances hormones and prevents illness"
+
+
+def test_normalize_boundaries_strips_edge_words():
+    from auditor.extractor import normalize_boundaries
+
+    text = "Grab it now, the timer says 4 minutes left. Hurry!"
+    start = text.index("the timer")
+    span = {"start": start, "end": text.index(".") + 1, "category": "deceptive_urgency", "score": 1.0}
+    [out] = normalize_boundaries(text, [span])
+    assert text[out["start"]:out["end"]] == "timer says 4 minutes left"
+
+
+def test_normalize_boundaries_keeps_clean_span_and_single_word():
+    from auditor.extractor import normalize_boundaries
+
+    text = "Hurry, only 2 left in stock"
+    span = {"start": 7, "end": len(text), "category": "deceptive_urgency", "score": 1.0}
+    assert normalize_boundaries(text, [span])[0]["start"] == 7
+    tiny = {"start": 0, "end": 3, "category": "deceptive_urgency", "score": 1.0}
+    assert normalize_boundaries("The", [tiny])[0]["end"] == 3  # never empties a span
+
+
+def test_annotation_files_follow_the_guide():
+    import importlib.util
+    import re
+
+    from auditor.config import PROJECT_ROOT
+
+    spec = importlib.util.spec_from_file_location("lint", PROJECT_ROOT / "scripts" / "lint_annotations.py")
+    lint = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(lint)
+    bad = []
+    for path in lint.FILES:
+        for tag, phrase in lint.SPAN.findall(path.read_text(encoding="utf-8")):
+            if lint.problems(phrase, tag):
+                bad.append((path.name, phrase))
+    assert not bad, bad
+
+
+def test_span_test_set_covers_every_violation_type():
+    from auditor.config import PROJECT_ROOT
+    from auditor.taxonomy import VIOLATIONS
+
+    lines = (PROJECT_ROOT / "data" / "span_test.txt").read_text(encoding="utf-8").splitlines()
+    docs = [parse_markup(l) for l in lines if l.strip()]
+    seen = {s["label"] for d in docs for s in d["spans"]}
+    assert seen == {c.span_tag for c in VIOLATIONS}

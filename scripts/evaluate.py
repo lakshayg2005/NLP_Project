@@ -98,7 +98,9 @@ def main():
                         default=["regex", "zero_shot", "setfit", "pipeline", "spans"])
     parser.add_argument("--data", type=Path, default=PROJECT_ROOT / "data" / "test_set.csv")
     parser.add_argument("--out", type=Path, default=None,
-                        help="Report path (default: reports/classification_report.md, or princeton_report.md).")
+                        help="Report path (default: reports/classification_report.md).")
+    parser.add_argument("--setfit-dir", type=Path, default=None,
+                        help="Evaluate this SetFit model folder instead of the configured one.")
     parser.add_argument("--princeton", action="store_true",
                         help="Evaluate on the Princeton 'Dark Patterns at Scale' dataset.")
     parser.add_argument("--include-misdirection", action="store_true",
@@ -128,6 +130,8 @@ def main():
     if args.out:
         out = args.out
 
+    if args.out and not args.princeton:
+        out = args.out
     texts, labels = df.text.tolist(), df.label.tolist()
     eval_labels = [k for k in LABEL_KEYS if k in set(labels)] or LABEL_KEYS
     sections = [f"# Classification report\n\nTest set: {data_desc}\n"]
@@ -147,7 +151,7 @@ def main():
         elif system == "setfit":
             from auditor.classifier import SetFitClassifier
 
-            preds = predict_with(SetFitClassifier(), texts)
+            preds = predict_with(SetFitClassifier(args.setfit_dir), texts)
         else:
             raise SystemExit(f"Unknown system {system}")
         ms = (time.perf_counter() - t0) * 1000 / len(texts)

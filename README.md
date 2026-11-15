@@ -1,6 +1,6 @@
 # E-Commerce Compliance & Dark Pattern Auditor
 
-[![Tests](https://github.com/iamshashankyadav/Dark-pattern-Auditor/actions/workflows/tests.yml/badge.svg)](https://github.com/iamshashankyadav/Dark-pattern-Auditor/actions/workflows/tests.yml)
+[![Tests](https://github.com/lakshayg2005/NLP_Project/actions/workflows/tests.yml/badge.svg)](https://github.com/lakshayg2005/NLP_Project/actions/workflows/tests.yml)
 
 An NLP pipeline that audits marketplace product copy for manipulative **dark patterns**
 before they turn into regulatory problems (FTC, EU consumer-protection rules). Instead of
@@ -51,6 +51,7 @@ Reviewer decisions are stored in `human_feedback` and merged into SetFit trainin
 auditor/            core library
   taxonomy.py       risk categories, NLI hypotheses, BIO label set
   lexicon.py        regex patterns + semantic phrase bank
+  negation.py       rule-based negation check ("no hidden fees" is not a violation)
   heuristics.py     Phase 1 filter
   embeddings.py     sentence-transformer similarity
   classifier.py     Phase 2 (SetFit / zero-shot) + document aggregation
@@ -60,7 +61,8 @@ auditor/            core library
   api.py            FastAPI service
   spans.py, metrics.py, text_utils.py
 dashboard/app.py    Streamlit UI
-scripts/            training, data generation, evaluation, DB seeding
+scripts/            training, data generation, evaluation, DB seeding, B2-B4 reports
+docs/               blueprint, label mapping, annotation guide, issues
 data/               seed corpus, test sets, span data, demo products
 sql/schema.sql      PostgreSQL DDL
 tests/              pytest suite (uses stub models, runs offline)
@@ -75,8 +77,14 @@ pip install -r requirements.txt
 cp .env.example .env            # optional; defaults use SQLite
 ```
 
-PostgreSQL (optional): `docker compose up -d`, then set
-`DATABASE_URL=postgresql+psycopg2://auditor:auditor@localhost:5432/compliance` in `.env`.
+Docker (API, dashboard, and PostgreSQL): `docker compose up --build`. The dashboard opens
+at [http://localhost:8501](http://localhost:8501), the API at [http://localhost:8000/docs](http://localhost:8000/docs),
+and PostgreSQL is initialized with the schema and a sample flagged product. The API and
+dashboard share the `DATABASE_URL` configured in Compose. Set `POSTGRES_USER`,
+`POSTGRES_PASSWORD`, and `POSTGRES_DB` in `.env` to change the local database credentials.
+
+To connect trained models stored on Hugging Face, set `SETFIT_MODEL_REPO` and
+`SPAN_MODEL_REPO` to their model repository IDs. Local model directories take precedence.
 
 ## Train the models
 
@@ -103,6 +111,11 @@ python scripts/seed_db.py --reset               # load demo products
 uvicorn auditor.api:app --reload                # API on http://localhost:8000/docs
 streamlit run dashboard/app.py                  # dashboard on http://localhost:8501
 ```
+
+To prepare a public Hugging Face Space, configure the Space secrets `SETFIT_MODEL_REPO`
+and `SPAN_MODEL_REPO` with public model repository IDs and set `HF_SPACE=true`; this limits
+the dashboard navigation to **Live audit**. See [docs/huggingface_space.md](docs/huggingface_space.md)
+for the deployment checklist.
 
 API endpoints:
 
@@ -186,6 +199,45 @@ Strict F1 requires exact phrase boundaries. Lenient F1 counts any same-type over
 what matters for highlighting. The token classifier finds every claim and urgency phrase in the
 test set (recall 1.0). Most remaining strict errors are boundary disagreements, such as
 "timer says 4 minutes left" vs the gold "the timer says 4 minutes left".
+
+### Negation, Hinglish and span boundaries (issues B2 to B4)
+
+**B2: negation.** `auditor/negation.py` drops regex hits preceded by a negation cue in the same
+clause, 35 reassuring examples were added to `data/seed_corpus.csv` and 17 to the span
+generator, and `data/negation_test.csv` holds 69 examples (49 safe, 20 violations that contain
+negation words). Offline regex results (`python scripts/negation_report.py`,
+[reports/negation_comparison.md](reports/negation_comparison.md)):
+
+| System | negation_test.csv acc | test_set.csv acc |
+|---|---|---|
+| Regex, negation off | 0.522 | 0.829 |
+| Regex, negation on | **0.971** | 0.829 |
+
+The motivating example now comes out safe, and overall test accuracy is unchanged. The SetFit
+before/after rows need two training runs (commands in the `scripts/train_setfit.py` docstring)
+followed by `python scripts/negation_report.py --setfit-before ... --setfit-after ...`.
+
+**B3: Hinglish.** `data/hinglish_seed.csv` (15 per class, 105 rows) and `data/hinglish_test.csv`
+(6 per class, 42 rows) are written in Roman script. Compare models with
+`scripts/compare_models.py` (writes [reports/hinglish_comparison.md](reports/hinglish_comparison.md)
+and a recommendation from the measured numbers). Measured so far, regex only:
+
+| System | English test (70) | Hinglish test (42) |
+|---|---|---|
+| Regex lexicon | 0.829 | 0.310 |
+
+The English-only and multilingual SetFit rows require training on a machine with the models
+downloaded (`--base-model sentence-transformers/paraphrase-multilingual-mpnet-base-v2`).
+
+**B4: span boundaries.** The edge conventions are written down in
+[docs/annotation_guide.md](docs/annotation_guide.md), enforced by `scripts/lint_annotations.py`
+(also run by the test suite), and `data/span_seed.txt`, `data/span_test.txt` and the generator
+templates follow them. `span_test.txt` now also covers confirm-shaming, drip pricing and bait and
+switch (42 documents, 39 gold spans). `auditor.extractor.normalize_boundaries` applies the same
+rules to model output. Compare extractors with `python scripts/span_boundary_report.py`; the
+DistilBERT result before the change was 0.414 strict / 0.915 lenient on the old annotation. Rows
+for the retrained DistilBERT and `roberta-base` models need training
+(`scripts/train_span_extractor.py --base-model roberta-base ...`).
 
 ### Real-world results (Princeton "Dark Patterns at Scale" dataset)
 
@@ -273,9 +325,10 @@ Measured on the 70-item test set with the SetFit classifier (full report: [repor
 * **The regex baseline is optimistic.** The lexicon and the test set were written by the
   same team, so the lexicon partly anticipates test phrasing. It also cannot localise spans
   (strict F1 0.09).
-* **Negation is a known failure mode.** "Pay once, there are no recurring fees" is
-  classified as a subscription trap with high confidence. Reviewer feedback on such cases is
-  exactly what the retraining loop is for.
+* **Negation (fixed in the regex tier, to be re-measured for SetFit).** "Pay once, there are no
+  recurring fees" used to be flagged as a subscription trap. The lexicon now drops hits inside
+  a negated clause (see the next section). The SetFit classifier must be retrained on the
+  negation examples added to `data/seed_corpus.csv` before its own numbers change.
 * **The data is small and partly synthetic.** Span training data is template-generated plus
   60 hand-annotated sentences. Dev F1 is 1.0 on synthetic data, so only the hand-written test
   sets are meaningful.

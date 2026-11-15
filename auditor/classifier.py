@@ -69,7 +69,11 @@ class SetFitClassifier:
         from setfit import SetFitModel
 
         self.model_dir = model_dir or get_settings().setfit_model_dir
-        self._model = SetFitModel.from_pretrained(str(self.model_dir))
+        settings = get_settings()
+        source = self.model_dir
+        if not (source / "config.json").exists() and not (source / "model_head.pkl").exists():
+            source = settings.setfit_model_repo or source
+        self._model = SetFitModel.from_pretrained(str(source))
         if _device() == 0:
             self._model.to("cuda")
 
@@ -86,6 +90,8 @@ def get_classifier(backend: str | None = None):
     if backend == "setfit":
         model_dir = get_settings().setfit_model_dir
         if (model_dir / "config.json").exists() or (model_dir / "model_head.pkl").exists():
+            return SetFitClassifier(model_dir)
+        if get_settings().setfit_model_repo:
             return SetFitClassifier(model_dir)
         log.warning("SetFit model not found at %s; falling back to zero-shot.", model_dir)
     return ZeroShotClassifier()

@@ -4,6 +4,7 @@
 """
 
 import html
+import os
 import sys
 from pathlib import Path
 
@@ -18,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from auditor import db  # noqa: E402
 from auditor.pipeline import FLAGGED, NEEDS_REVIEW, PASSED  # noqa: E402
 from auditor.taxonomy import BY_KEY, CATEGORIES, LABEL_KEYS, VIOLATIONS  # noqa: E402
+from dashboard.features import flagged_products_csv, parse_product_csv  # noqa: E402
 
 st.set_page_config(page_title="Compliance Auditor", page_icon="🛡️", layout="wide")
 
@@ -175,6 +177,62 @@ def page_flagged():
                 st.rerun()
 
 
+def page_bulk_upload():
+    st.caption("Upload a CSV with `title`, `seller_id`, and `text` columns. Each row is audited and saved.")
+    flagged_csv = flagged_products_csv(load_products())
+    if flagged_csv.count("\n") > 1:
+        st.download_button("Download flagged items as CSV", flagged_csv,
+                           "flagged_products.csv", "text/csv")
+    uploaded = st.file_uploader("Product CSV", type=["csv"])
+    if uploaded is None:
+        return
+    try:
+        frame = parse_product_csv(uploaded)
+        if frame.empty:
+            st.info("The uploaded CSV has no products.")
+            return
+        st.dataframe(frame.head(10), use_container_width=True, hide_index=True)
+        if st.button("Audit and import products", type="primary"):
+            from auditor.pipeline import audit_many
+
+            rows = frame.fillna("").to_dict("records")
+            results = audit_many([str(row["text"]) for row in rows])
+            with db.session_scope() as s:
+                for row, result in zip(rows, results):
+                    product = db.create_product(s, str(row["title"]), str(row["seller_id"]), str(row["text"]))
+                    db.apply_audit(s, product, result)
+            st.success(f"Audited and saved {len(rows)} products.")
+            st.rerun()
+    except (UnicodeDecodeError, pd.errors.ParserError, ValueError) as exc:
+        st.error(f"Could not read this CSV: {exc}")
+
+
+def page_seller_history():
+    products = load_products()
+    sellers = sorted({p.seller_id for p in products})
+    if not sellers:
+        st.info("No sellers have audited products yet.")
+        return
+    seller = st.selectbox("Seller", sellers)
+    history = [p for p in products if p.seller_id == seller]
+    events = [{"date": p.audited_at or p.created_at, "status": p.status,
+               "product": p.title, "category": f.violation_category}
+              for p in history for f in p.flags if not f.resolved]
+    if events:
+        df = pd.DataFrame(events).sort_values("date")
+        chart = px.histogram(df, x="date", color="category", title="Open violation history over time",
+                             color_discrete_map=SOLID)
+        st.plotly_chart(chart, use_container_width=True)
+        st.dataframe(df, use_container_width=True, hide_index=True)
+    else:
+        st.info("No open violations recorded for this seller.")
+    st.subheader("Audited products")
+    st.dataframe(pd.DataFrame([{"product_id": p.product_id, "title": p.title,
+                               "status": p.status, "created_at": p.created_at,
+                               "audited_at": p.audited_at} for p in history]),
+                 use_container_width=True, hide_index=True)
+
+
 def page_review():
     st.caption(
         "Items whose violation confidence fell in the uncertain band. Your decisions are stored "
@@ -242,7 +300,11 @@ pages = {
     "Flagged products": page_flagged,
     "Human review queue": page_review,
     "Live audit": page_playground,
+    "Bulk CSV": page_bulk_upload,
+    "Seller history": page_seller_history,
 }
+if os.getenv("HF_SPACE", "").lower() in {"1", "true", "yes"}:
+    pages = {"Live audit": page_playground}
 choice = st.sidebar.radio("View", list(pages))
 st.sidebar.markdown("---")
 st.sidebar.caption("Categories")

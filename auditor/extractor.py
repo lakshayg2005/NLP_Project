@@ -66,9 +66,11 @@ class TransformerSpanExtractor:
         self.normalize = normalize
         # "first": each word takes the label of its first sub-token, which avoids
         # spans that start or stop in the middle of a word.
+        settings = get_settings()
+        source = model_dir if (model_dir / "config.json").exists() else settings.span_model_repo
         self._pipe = pipeline(
             "token-classification",
-            model=str(model_dir),
+            model=str(source),
             aggregation_strategy="first",
             device=_device(),
         )
@@ -141,7 +143,7 @@ def _expand_to_words(text: str, spans: list[dict]) -> list[dict]:
 @lru_cache
 def get_extractor():
     model_dir = get_settings().span_model_dir
-    if (model_dir / "config.json").exists():
+    if (model_dir / "config.json").exists() or get_settings().span_model_repo:
         return TransformerSpanExtractor(model_dir)
     log.warning("Span model not found at %s; using regex span extractor.", model_dir)
     return RegexSpanExtractor()

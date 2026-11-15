@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     setfit_model_dir: Path = PROJECT_ROOT / "models" / "setfit"
     span_model_dir: Path = PROJECT_ROOT / "models" / "span_extractor"
+    setfit_model_repo: str | None = None
+    span_model_repo: str | None = None
 
     # Phase 2 routing: violations at or above this confidence are flagged,
     # anything less certain goes to the human evaluation queue.

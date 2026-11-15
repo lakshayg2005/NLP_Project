@@ -1,6 +1,6 @@
 # E-Commerce Compliance & Dark Pattern Auditor
 
-[![Tests](https://github.com/iamshashankyadav/Dark-pattern-Auditor/actions/workflows/tests.yml/badge.svg)](https://github.com/iamshashankyadav/Dark-pattern-Auditor/actions/workflows/tests.yml)
+[![Tests](https://github.com/lakshayg2005/NLP_Project/actions/workflows/tests.yml/badge.svg)](https://github.com/lakshayg2005/NLP_Project/actions/workflows/tests.yml)
 
 An NLP pipeline that audits marketplace product copy for manipulative **dark patterns**
 before they turn into regulatory problems (FTC, EU consumer-protection rules). Instead of
@@ -77,8 +77,14 @@ pip install -r requirements.txt
 cp .env.example .env            # optional; defaults use SQLite
 ```
 
-PostgreSQL (optional): `docker compose up -d`, then set
-`DATABASE_URL=postgresql+psycopg2://auditor:auditor@localhost:5432/compliance` in `.env`.
+Docker (API, dashboard, and PostgreSQL): `docker compose up --build`. The dashboard opens
+at [http://localhost:8501](http://localhost:8501), the API at [http://localhost:8000/docs](http://localhost:8000/docs),
+and PostgreSQL is initialized with the schema and a sample flagged product. The API and
+dashboard share the `DATABASE_URL` configured in Compose. Set `POSTGRES_USER`,
+`POSTGRES_PASSWORD`, and `POSTGRES_DB` in `.env` to change the local database credentials.
+
+To connect trained models stored on Hugging Face, set `SETFIT_MODEL_REPO` and
+`SPAN_MODEL_REPO` to their model repository IDs. Local model directories take precedence.
 
 ## Train the models
 
@@ -105,6 +111,11 @@ python scripts/seed_db.py --reset               # load demo products
 uvicorn auditor.api:app --reload                # API on http://localhost:8000/docs
 streamlit run dashboard/app.py                  # dashboard on http://localhost:8501
 ```
+
+To prepare a public Hugging Face Space, configure the Space secrets `SETFIT_MODEL_REPO`
+and `SPAN_MODEL_REPO` with public model repository IDs and set `HF_SPACE=true`; this limits
+the dashboard navigation to **Live audit**. See [docs/huggingface_space.md](docs/huggingface_space.md)
+for the deployment checklist.
 
 API endpoints:
 
